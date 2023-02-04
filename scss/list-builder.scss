@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans&display=swap');
+@import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+
+
+$font-family-sans-serif: 'Sofia Sans', sans-serif;
+$enable-rounded: false;
+
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
