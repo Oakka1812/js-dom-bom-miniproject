@@ -3,6 +3,9 @@
 const app = document.querySelector("#app");
 const productCards = document.querySelector("#productCards");
 const productCategories = document.querySelector("#productCategories");
+const searchInput = document.querySelector("#searchInput");
+const cart = document.querySelector("#cart");
+const header = document.querySelector("#header");
 const productCardDetail = new bootstrap.Modal("#productCardDetailModal");
 
 const categories = [...new Set(products.map((product) => product.category))];
@@ -33,11 +36,14 @@ const createCategoryBtn = (name) => {
 
 const createProductCard = (product) => {
   const div = document.createElement("div");
+  div.addEventListener('click',() =>{
+    renderProductDetailModal();
+  });
   div.className = "col-12 col-md-6 col-lg-4 product-card";
   div.setAttribute("product-id", product.id);
   div.innerHTML = `<div class="card">
 <div class="card-body">
-    <img src="${product.thumbnail}" alt="" class="product-img">
+    <img src="" alt="" class="product-img">
     <h3 class="fw-bold mt-2 mb-2 text-truncate">${product.title}</h3>
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div class="badge bg-secondary text-capitalize">${slugToText(
@@ -53,11 +59,51 @@ const createProductCard = (product) => {
     }</p>
     <hr>
     <div class="d-flex justify-content-between align-items-center">
-        <p class="mb-0">$ ${product.price}</p>
-        <button class="btn btn-outline-dark">Add to Cart</button>
+        <p class="mb-0 price">$ ${product.price}</p>
+        
     </div>
 </div>
 </div>`;
+
+const img = new Image();
+img.src = product.thumbnail;
+img.className = "product-img";
+div.querySelector(".card-body").prepend(img);
+
+const btn = document.createElement("button");
+btn.className = "btn btn-outline-dark add";
+btn.innerText = "Add to Cart";
+
+btn.addEventListener('click', (event) => {
+  event.stopPropagation();
+ if(btn.classList.contains("active")){
+  btn.classList.remove("active");
+  btn.innerText = "Add to Cart";
+ }else{
+  const imgAnimate = new Image();
+  imgAnimate.src = product.thumbnail;
+
+  imgAnimate.style.position = "fixed";
+  imgAnimate.style.transition = "0.5s";
+  imgAnimate.style.zIndex = 2000;
+  imgAnimate.style.width = img.getBoundingClientRect().width + "px";
+  imgAnimate.style.height = img.getBoundingClientRect().height + "px";
+  imgAnimate.style.top = img.getBoundingClientRect().top + "px";
+  imgAnimate.style.left = img.getBoundingClientRect().left + "px";
+
+  setTimeout(() => {
+    imgAnimate.style.width = 0 + "px";
+    imgAnimate.style.height = 0 + "px";
+    imgAnimate.style.top = cart.getBoundingClientRect().top + "px";
+    imgAnimate.style.left = cart.getBoundingClientRect().left + "px";
+  }, 100);
+
+  document.body.append(imgAnimate);
+  btn.classList.add("active");
+  btn.innerText = "Added";
+ }
+});
+div.querySelector(".price").after(btn);
   return div;
 };
 
@@ -66,6 +112,35 @@ const renderProductCard = (products) => {
   products.forEach((product) => {
     productCards.append(createProductCard(product));
   });
+};
+
+const renderProductByCategory = () => {
+  const currentCategory = event.target.getAttribute("cat");
+  if (currentCategory === "all") {
+    renderProductCard(products);
+  } else {
+    renderProductCard(
+      products.filter(
+        (product) => product.category === event.target.getAttribute("cat")
+      )
+    );
+  }
+
+  //remove old active class
+  productCategories.querySelector(".active").classList.remove("active");
+  //add new active class
+  event.target.classList.add("active");
+};
+
+const renderBySearch = (keyword) => {
+  renderProductCard(
+    products.filter((product) => {
+      return (
+        product.title.toLocaleLowerCase().search(keyword.toLocaleLowerCase()) != -1 ||
+        product.description.toLocaleLowerCase().search(keyword.toLocaleLowerCase()) != -1
+      );
+    })
+  );
 };
 
 const renderProductDetailModal = () => {
@@ -152,16 +227,33 @@ const productDetailCarouselItem = (arr) => {
   return { slides, indicators };
 };
 
-app.addEventListener("click", (event) => {
-  // console.log(event.target);
-  if (event.target.closest(".product-card")) {
-    renderProductDetailModal();
+searchInput.addEventListener('keyup', () => {
+  renderBySearch(searchInput.value);
+});
+
+window.addEventListener('scroll', (event) =>{
+  if(window.scrollY > 150){
+    header.classList.add("sticky-top");
+  }else{
+    header.classList.remove("sticky-top");
   }
 
-  if(event.target.classList.contains("cat")){
+})
+
+app.addEventListener("click", (event) => {
+  // console.log(event.target);
+  // if (event.target.closest(".product-card") && !event.target.classList.contains("add")) {
+  //   renderProductDetailModal();
+  // }
+
+  if (event.target.classList.contains("cat")) {
     // console.log(event.target);
     // console.log(products);
     // console.log(event.target.getAttribute("cat"))
-    renderProductCard(products.filter((product) => product.category === event.target.getAttribute("cat")))
+    renderProductByCategory();
   }
+
+  // if(event.target.classList.contains("add")){
+  //   console.log("add to cart");
+  // }
 });
