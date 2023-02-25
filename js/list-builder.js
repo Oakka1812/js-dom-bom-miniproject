@@ -5,8 +5,8 @@ const total = document.querySelector("#total");
 const doneTotal = document.querySelector("#doneTotal");
 
 const data = [
-  "Taeyeon",
-  "Sunny",
+  // "Taeyeon",
+  // "Sunny",
   // "Tiffany",
   // "Hyoyeon",
   // "Yuri",
@@ -17,6 +17,7 @@ const data = [
 
 const counter = () => {
   const totalCount = lists.children.length;
+  console.log(lists.children);
   const doneCount = [...lists.children].filter(
     (d) => d.querySelector(".form-check-input").checked
   ).length;

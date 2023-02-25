@@ -63,8 +63,8 @@ fonts.forEach((font) => {
 
 
 text.addEventListener("keyup", (event) => {
-    // console.log(text.value);
-    // console.log(event.target.value);
+    
+    // console.log(event);
     output.innerText = event.target.value;
     count.innerText = event.target.value.length;
 });
@@ -78,7 +78,7 @@ fontSize.addEventListener('change', (event) => {
 })
 
 fontFamily.addEventListener('change', (event) => {
-    console.log(event.target.value);
+    // console.log(event.target.value);
     output.style.fontFamily = event.target.value;
 })
 
